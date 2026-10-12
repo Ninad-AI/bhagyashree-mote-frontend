@@ -6,10 +6,10 @@ import Ripple from '@/components/ui/ripple';
 
 export type SessionStatus = 'connecting' | 'listening' | 'speaking';
 
-const STATUS_STYLES: Record<SessionStatus, { label: string; dot: string; pill: string }> = {
-    connecting: { label: 'Connecting', dot: 'bg-amber-400', pill: 'border-amber-400/30 text-amber-200' },
-    listening: { label: 'Listening', dot: 'bg-emerald-400', pill: 'border-emerald-400/30 text-emerald-200' },
-    speaking: { label: 'Speaking', dot: 'bg-rose-400', pill: 'border-rose-400/30 text-rose-200' },
+const STATUS_STYLES: Record<SessionStatus, { label: string; dot: string }> = {
+    connecting: { label: 'Connecting', dot: 'bg-yellow-400' },
+    listening: { label: 'Listening', dot: 'bg-red-500' },
+    speaking: { label: 'Speaking', dot: 'bg-green-400' },
 };
 
 interface VoiceSessionUIProps {
@@ -153,7 +153,7 @@ export default function VoiceSessionUI({
                         <span
                             role="status"
                             aria-live="polite"
-                            className={`flex items-center gap-2 whitespace-nowrap rounded-full border bg-black/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-md transition-colors duration-300 ${statusStyle.pill}`}
+                            className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.3em] text-white/70"
                         >
                             <span className="relative flex h-2 w-2">
                                 <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${statusStyle.dot}`} />
