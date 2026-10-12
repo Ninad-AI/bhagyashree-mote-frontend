@@ -4,8 +4,16 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Ripple from '@/components/ui/ripple';
 
+export type SessionStatus = 'connecting' | 'listening' | 'speaking';
+
+const STATUS_STYLES: Record<SessionStatus, { label: string; dot: string; pill: string }> = {
+    connecting: { label: 'Connecting', dot: 'bg-amber-400', pill: 'border-amber-400/30 text-amber-200' },
+    listening: { label: 'Listening', dot: 'bg-emerald-400', pill: 'border-emerald-400/30 text-emerald-200' },
+    speaking: { label: 'Speaking', dot: 'bg-rose-400', pill: 'border-rose-400/30 text-rose-200' },
+};
+
 interface VoiceSessionUIProps {
-    isSpeaking: boolean;
+    status: SessionStatus;
     timeLeft: number;
     totalTime: number;
     onEndCall: () => void;
@@ -14,7 +22,7 @@ interface VoiceSessionUIProps {
 }
 
 export default function VoiceSessionUI({
-    isSpeaking,
+    status,
     timeLeft,
     totalTime,
     onEndCall,
@@ -42,6 +50,8 @@ export default function VoiceSessionUI({
     const circumference = 2 * Math.PI * radius;
     const progress = totalTime > 0 ? timeLeft / totalTime : 0;
     const dashOffset = circumference * (1 - progress);
+    const isSpeaking = status === 'speaking';
+    const statusStyle = STATUS_STYLES[status];
 
     const formatTime = (s: number) => {
         const t = Math.max(0, s);
@@ -136,9 +146,22 @@ export default function VoiceSessionUI({
 
                     {/* Controls - absolutely below the circle, so they don't shift the image */}
                     <div
-                        className="absolute left-1/2 top-1/2 flex flex-col items-center gap-8"
+                        className={`absolute left-1/2 top-1/2 flex flex-col items-center ${compact ? 'gap-3' : 'gap-5'}`}
                         style={{ transform: `translate(-50%, ${IMG_SIZE / 2 + (compact ? 30 : 47)}px)` }}
                     >
+                        {/* Status */}
+                        <span
+                            role="status"
+                            aria-live="polite"
+                            className={`flex items-center gap-2 whitespace-nowrap rounded-full border bg-black/40 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-md transition-colors duration-300 ${statusStyle.pill}`}
+                        >
+                            <span className="relative flex h-2 w-2">
+                                <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${statusStyle.dot}`} />
+                                <span className={`relative inline-flex h-2 w-2 rounded-full ${statusStyle.dot}`} />
+                            </span>
+                            {statusStyle.label}
+                        </span>
+
                         {/* Timer */}
                         <span className={`tabular-nums font-extralight tracking-tight text-white/95 drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] ${compact ? 'text-4xl' : 'text-5xl sm:text-6xl'}`}>
                             {formatTime(timeLeft)}

@@ -17,6 +17,7 @@ export default function Home() {
   const [flowState, setFlowState] = useState<FlowState>("idle");
   const [timeLeft, setTimeLeft] = useState(0);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   const mousePosRef = useRef({ x: 0, y: 0 });
@@ -152,6 +153,7 @@ export default function Home() {
     if (flowState !== "active") return;
 
     setIsSpeaking(false);
+    setIsConnected(false);
 
     const ws = new WebSocket(WS_URL);
     ws.binaryType = "arraybuffer";
@@ -178,6 +180,7 @@ export default function Home() {
           },
         });
         micControllerRef.current = controller;
+        setIsConnected(true);
       } catch (err) {
         // mic start failed
       }
@@ -221,6 +224,7 @@ export default function Home() {
 
     ws.onclose = () => {
       setIsSpeaking(false);
+      setIsConnected(false);
     };
 
     return () => {
@@ -264,6 +268,7 @@ export default function Home() {
     setFlowState("idle");
     setTimeLeft(0);
     setIsSpeaking(false);
+    setIsConnected(false);
   }, [stopPlaybackImmediately]);
 
   /* ── Countdown timer ── */
@@ -308,7 +313,7 @@ export default function Home() {
       >
         {flowState === "active" ? (
             <VoiceSessionUI
-              isSpeaking={isSpeaking}
+              status={!isConnected ? "connecting" : isSpeaking ? "speaking" : "listening"}
               timeLeft={timeLeft}
               totalTime={SESSION_MINUTES * 60}
               onEndCall={handleEndCall}
